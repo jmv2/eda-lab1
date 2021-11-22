@@ -11,6 +11,7 @@ typedef struct nodo
 }Nodo;
 
 
+
 Nodo* crearNodo(int posicionFila, char tipo, int duracion){
     
     Nodo* nuevo = (Nodo*) malloc(sizeof(Nodo));
@@ -98,13 +99,13 @@ int largo(Nodo* lista){
     return i;
 }
 
-Nodo* filtrar_vip(Nodo* lst_org, Nodo* lst_dst){
+Nodo* filtrar(Nodo* lst_org, Nodo* lst_dst){
     Nodo* auxiliar;
     auxiliar = lst_org;
 
     while (auxiliar != NULL){
         if (auxiliar->tipo == 'v'){
-            lst_dst = insertar(lst_dst, largo(lst_dst),auxiliar->posicionFila, 'v', auxiliar->duracion);
+            lst_dst = agregar(lst_dst, auxiliar->posicionFila, auxiliar->tipo, auxiliar->duracion);
         }
         auxiliar = auxiliar->siguiente;
     }
@@ -112,12 +113,9 @@ Nodo* filtrar_vip(Nodo* lst_org, Nodo* lst_dst){
     return lst_dst;
 }
 
-int main(int argc, char const *argv[])
-{
-    Nodo* listaEntrada = (Nodo*) malloc(sizeof(Nodo));
-    Nodo* listaResultado = (Nodo*) malloc(sizeof(Nodo));
-    FILE* a_entrada =  fopen("entrada.in", "r");
-    
+Nodo* cargarContenidoEnLista(Nodo* lst, char* nombreArchivo){
+
+    FILE* archivo = fopen(nombreArchivo, "r");
     char lineaArchivo[15];
     char *posicionFila; 
     char *tipoPublico;
@@ -128,15 +126,10 @@ int main(int argc, char const *argv[])
     int n_PosicionFila;
     int posicionLista = 0;
     int acumulador_tiempo;
-    
-    listaEntrada = NULL;
-    listaResultado = NULL;
-    
-    rewind(a_entrada);
 
-    while(!feof(a_entrada)){
+    while(!feof(archivo)){
     
-        fgets(lineaArchivo, 15, a_entrada);
+        fgets(lineaArchivo, 15, archivo);
         token = strtok(lineaArchivo, delimitador);
         posicionFila = (char*) malloc(strlen(token)*sizeof(char));
         strcpy(posicionFila, token);
@@ -150,19 +143,25 @@ int main(int argc, char const *argv[])
         duracionAtencion = (char*) malloc(strlen(token)*sizeof(char));  
         strcpy(duracionAtencion, token);
         duracion = atoi(duracionAtencion);
-        listaEntrada = agregar(listaEntrada, n_PosicionFila, tipoPublico[0], duracion);
-        //listaEntrada = insertar(listaEntrada, posicionLista, n_PosicionFila, tipoPublico[0], duracion);
+        lst = agregar(lst, n_PosicionFila, tipoPublico[0], duracion);
         posicionLista++; 
     }
-    fclose(a_entrada);
+    return lst;
+}
 
-    //filtrar_vip(listaEntrada, listaResultado);
-    //imprimirLista(listaResultado);
-
+int main(int argc, char const *argv[])
+{
+    Nodo* listaEntrada = (Nodo*) malloc(sizeof(Nodo));
+    Nodo* listaResultado = (Nodo*) malloc(sizeof(Nodo));
+    listaEntrada = NULL;
+    listaResultado = NULL;
+    
+    listaEntrada = cargarContenidoEnLista(listaEntrada, "entrada.in");
+    listaResultado = filtrar_vip(listaEntrada, listaResultado);
+    imprimirLista(listaResultado);
+    
+    //imprimirLista(listaEntrada);
     //printf("Largo lista: %d\n", largo(listaEntrada));
-
-
-    imprimirLista(listaEntrada);
 
     return 0;
 }
