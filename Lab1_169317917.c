@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 typedef struct nodo
 {
     int posicionFila; 
@@ -48,33 +49,6 @@ Nodo* agregar(Nodo* lst, int posicionFila, char tipo, int duracion){
     }
 }
 
-Nodo* insertar(Nodo* lista, int posicion, int posicionFila, char tipo, int duracion){
-    if(posicion < 0){
-        return lista;
-    }
-
-    if(posicion == 0){
-        Nodo* nuevo = crearNodo(posicionFila, tipo, duracion);
-        nuevo->siguiente = lista;
-        return nuevo;
-    }
-
-    int i = 0;
-    Nodo* indice = lista;
-
-    while(indice != NULL && i < posicion - 1){
-        indice = indice->siguiente;
-        i++;
-    }
-
-    if(indice != NULL){
-        Nodo* nuevo = crearNodo(posicionFila, tipo, duracion);
-        nuevo->siguiente = indice->siguiente; // 
-        indice->siguiente = nuevo;  // dirección de nuevo en indice->siguente
-    }
-    return lista;
-}
-
 void imprimirLista(Nodo* lst){
     Nodo* auxiliar;
     auxiliar = lst;
@@ -87,29 +61,39 @@ void imprimirLista(Nodo* lst){
     }
 }
 
-int largo(Nodo* lista){
-    int i = 0;
-    Nodo* indice = lista;
-    
-    while(indice != NULL){
-        indice = indice -> siguiente;
-        i++;
-    }
-
-    return i;
-}
-
-Nodo* filtrar(Nodo* lst_org, Nodo* lst_dst){
+Nodo* filtrar(Nodo* lst_org, Nodo* lst_dst, char criterio){
     Nodo* auxiliar;
     auxiliar = lst_org;
 
-    while (auxiliar != NULL){
-        if (auxiliar->tipo == 'v'){
-            lst_dst = agregar(lst_dst, auxiliar->posicionFila, auxiliar->tipo, auxiliar->duracion);
+    if (criterio == 'v')
+    {
+        while (auxiliar != NULL) {
+            if (auxiliar->tipo == criterio){
+                lst_dst = agregar(lst_dst, auxiliar->posicionFila, auxiliar->tipo, auxiliar->duracion);
+            }
+            auxiliar = auxiliar->siguiente;
         }
+    }else if (criterio == 'a')
+    {
+        while (auxiliar != NULL) 
+        {
+            if (auxiliar->tipo == criterio)
+            {
+                lst_dst = agregar(lst_dst, auxiliar->posicionFila, auxiliar->tipo, auxiliar->duracion);
+            }
         auxiliar = auxiliar->siguiente;
+        }
+    }else if (criterio == 'n')
+    {
+        while (auxiliar != NULL) 
+        {
+            if (auxiliar->tipo == criterio)
+            {
+                lst_dst = agregar(lst_dst, auxiliar->posicionFila, auxiliar->tipo, auxiliar->duracion);
+            }
+        auxiliar = auxiliar->siguiente;
+        }
     }
-
     return lst_dst;
 }
 
@@ -149,17 +133,34 @@ Nodo* cargarContenidoEnLista(Nodo* lst, char* nombreArchivo){
     return lst;
 }
 
+Nodo* calculoTiempo(Nodo* lst){
+    Nodo* auxiliar;
+    auxiliar = lst;
+    int tiempoTotal = 0;
+    lst = NULL;
+
+    while ((auxiliar != NULL) && (tiempoTotal <= 300)){
+        tiempoTotal = tiempoTotal + auxiliar->duracion;
+        lst = agregar(lst, auxiliar->posicionFila, auxiliar->tipo, auxiliar->duracion);
+        auxiliar = auxiliar->siguiente;
+    }
+    return lst;
+}
+
 int main(int argc, char const *argv[])
 {
     Nodo* listaEntrada = (Nodo*) malloc(sizeof(Nodo));
     Nodo* listaResultado = (Nodo*) malloc(sizeof(Nodo));
     listaEntrada = NULL;
     listaResultado = NULL;
-    
+
     listaEntrada = cargarContenidoEnLista(listaEntrada, "entrada.in");
-    listaResultado = filtrar_vip(listaEntrada, listaResultado);
+    listaResultado = filtrar(listaEntrada, listaResultado, 'a');
+    listaResultado = filtrar(listaEntrada, listaResultado, 'v');
+    listaResultado = filtrar(listaEntrada, listaResultado, 'n');
+    listaResultado = calculoTiempo(listaResultado);
     imprimirLista(listaResultado);
-    
+
     //imprimirLista(listaEntrada);
     //printf("Largo lista: %d\n", largo(listaEntrada));
 
