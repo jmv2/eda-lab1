@@ -15,10 +15,10 @@ void imprimirLista(Nodo* lst);
 Nodo* filtrar(Nodo* lst_org, Nodo* lst_dst, char criterio);
 Nodo* cargarContenidoEnLista(Nodo* lst, char* nombreArchivo);
 Nodo* filtroTiempo(Nodo* lst);
-int largoLista(Nodo* lst);
+int calculoTiempo(Nodo* lst);
 Nodo* diferencia(Nodo* lst_org, Nodo* lst_dst);
 
-int* obtenerFila(Nodo* lst);
+
 void escribirResultados(char* nombreArchivo, Nodo* lst_org, Nodo* lst_dst);
 
 int main(int argc, char const *argv[])
@@ -182,37 +182,37 @@ Nodo* filtroTiempo(Nodo* lst){
     int tiempoTotal = 0;
     lst = NULL;
 
-    while ((auxiliar != NULL) && (tiempoTotal <= 300)){
+
+    while ((auxiliar != NULL) && (tiempoTotal < 300))
+    {
         tiempoTotal = tiempoTotal + auxiliar->duracion;
+        if (tiempoTotal >= 300)
+        {
+            tiempoTotal = tiempoTotal - auxiliar->duracion;
+            break;
+        }
         lst = agregar(lst, auxiliar->posicionFila, auxiliar->tipo, auxiliar->duracion);
         auxiliar = auxiliar->siguiente;
     }
+
+    
+    
     return lst;
 }
-int largoLista(Nodo* lst){
-   int i = 0;
-    Nodo* indice = lst;
-    
-    while(indice != NULL){
-        indice = indice -> siguiente;
-        i++;
-    }
 
-    return i; 
-}
-int* obtenerFila(Nodo* lst){
-    int largo = largoLista(lst), indice = 0;
-    int* fila = (int*) malloc (largo * sizeof(int));
+int calculoTiempo(Nodo* lst)
+{   
+    int tiempo = 0;
     Nodo* aux = lst;
 
-    while (aux != aux)
+    while (aux != NULL)
     {
-        fila[indice] = aux->posicionFila;
+        tiempo = tiempo + aux->duracion;
         aux = aux->siguiente;
-        indice++;
     }
+    
 
-    return fila;
+    return tiempo;
 }
 
 Nodo* diferencia(Nodo* lst_org, Nodo* lst_dst)
@@ -250,8 +250,9 @@ void escribirResultados(char* nombreArchivo, Nodo* lst_org, Nodo* lst_dst)
     int indice;
     Nodo* auxiliar = lst_org;
     Nodo* lst_dif = (Nodo*) malloc(sizeof(Nodo));
+    int tiempo;
    
-    char c_numero[3];
+    char c_numero[4];
     
     fputs("Fila: \n", archivo);
     while (auxiliar != NULL)
@@ -286,7 +287,22 @@ void escribirResultados(char* nombreArchivo, Nodo* lst_org, Nodo* lst_dst)
 
         auxiliar = auxiliar->siguiente;
     }
-    
+
+    fputs("\nTiempo total: \n", archivo);
+    tiempo = calculoTiempo(lst_dst);
+    sprintf(c_numero, "%d\n", tiempo);
+    fputs(c_numero, archivo);
+
+    fputs("\nTiempo sobrante: \n", archivo);
+    tiempo = 300 - tiempo;
+    sprintf(c_numero, "%d\n", tiempo);
+    fputs(c_numero, archivo);
+
+    fputs("\nTiempo faltante: \n", archivo);
+    tiempo = calculoTiempo(lst_dif);
+    sprintf(c_numero, "%d\n", tiempo);
+    fputs(c_numero, archivo);
+
     fclose(archivo);
 
 }
